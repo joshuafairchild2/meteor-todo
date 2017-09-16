@@ -1,11 +1,26 @@
 import { Template } from 'meteor/templating';
 
+import { Tasks } from './../api/tasks.js';
+
 import './body.html';
 
 Template.body.helpers({
-  tasks: [
-    { text: 'Task 1' },
-    { text: 'Task 2' },
-    { text: 'Task 3' },
-  ],
+  tasks() {
+    return Tasks.find({}, { sort: { createdAt: -1 } });
+  }
+});
+
+Template.body.events({
+  'submit .new-task'(e) {
+    e.preventDefault();
+
+    const text = event.target.text.value;
+
+    Tasks.insert({
+      text,
+      createdAt: new Date()
+    });
+
+    event.target.text.value = '';
+  }
 });
