@@ -4,12 +4,6 @@ import { check } from 'meteor/check';
 
 export const Tasks = new Mongo.Collection('tasks');
 
-const validateEdit = (task) => {
-  if ((task.private && task.owner !== Meteor.userId()) || task.owner !== Meteor.userId()) {
-    throw new Meteor.Error('not-authorized');
-  }
-}
-
 if (Meteor.isServer) {
   Meteor.publish('tasks', function tasksPublication() {
     return Tasks.find({
@@ -42,7 +36,9 @@ Meteor.methods({
 
     const task = Tasks.findOne(taskId);
 
-    validateEdit(task);
+    if ((task.private && task.owner !== this.userId) || task.owner !== this.userId) {
+      throw new Meteor.Error('not-authorized');
+    }
 
     Tasks.remove(taskId);
   },
@@ -53,7 +49,9 @@ Meteor.methods({
 
     const task = Tasks.findOne(taskId);
 
-    validateEdit(task);
+    if ((task.private && task.owner !== this.userId) || task.owner !== this.userId) {
+      throw new Meteor.Error('not-authorized');
+    }
 
     Tasks.update(taskId, { $set: { checked: setChecked } });
   },
