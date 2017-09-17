@@ -28,6 +28,17 @@ if (Meteor.isServer) {
 
         assert.equal(Tasks.find().count(), 0);
       });
+
+      it('can mark own task complete', () => {
+        const markDone = Meteor.server.method_handlers['tasks.setChecked'];
+        const invocation = { userId };
+
+        markDone.apply(invocation, [taskId, true]);
+
+        const testTask = Tasks.findOne(taskId);
+
+        assert.equal(testTask.checked, true);
+      });
     });
   });
 }
